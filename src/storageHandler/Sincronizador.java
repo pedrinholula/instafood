@@ -19,35 +19,25 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Attr;
 
 public class Sincronizador {
 	File database;
-	int tamanho;
 
 	public Sincronizador() {
 		database = new File(".//resources//anotacoes.xml");
-		tamanho = 0;
 		
 	}
 	
-	//Guarda registro
-	public void guardaRegistro(Imagem imagem) throws IOException {
-		//Checa se já existe o arquivo xml
-		if(database.exists())
-			modificaRegistro(imagem);
-		else
-			criaRegistro(imagem);
-	}
-	
-	//Sobrescreve as anotações de uma imagem ou adiciona registro de uma outra imagem
-	private void modificaRegistro(Imagem imagem) throws IOException {
+	/**
+	 * Procura se existe anotações do usuário para uma imagem específica. Caso exista, importa as anotações para a imagem
+	 * @param imagem
+	 */
+	public void importaAnotacoes(Imagem imagem) {
 		
-		try{
-			
+		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 			Document doc = docBuilder.parse(database.getAbsolutePath());
@@ -56,7 +46,6 @@ public class Sincronizador {
 			//Checa se o registro já existe
 			NodeList listaImagens = doc.getElementsByTagName("imagem");
 			int tamanhoLista = listaImagens.getLength();
-			System.out.println("tamanho da lista = " + tamanhoLista);
 			
 			for(int i = 0; i < tamanhoLista; i++) {
 				
@@ -68,21 +57,100 @@ public class Sincronizador {
 					
 					NodeList filhos = e.getChildNodes();
 					
-					//Sobrescreve informações sobre a imagem
+					imagem.setTag( filhos.item(1).getTextContent() );
+					imagem.setLocal( filhos.item(2).getTextContent() );
+					imagem.setComida( filhos.item(3).getTextContent() );
+					
+					return;
+				
+				}
+			}
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		   } catch (IOException ioe) {
+			ioe.printStackTrace();
+		   } catch (SAXException sae) {
+			sae.printStackTrace();
+		   }
+		
+	}
+	
+	/**
+	 * Guardar o registro das anotações do usuário para uma imagem no xml
+	 * @param imagem
+	 * @throws IOException
+	 */
+	public void guardaRegistro(Imagem imagem) throws IOException {		
+		//Verifica se já existe um registro de anotações do usuário
+		if(database.exists())
+			modificaRegistro(imagem);
+		else
+			criaRegistro(imagem);
+	}
+	
+	/**
+	 * Escreve as modificações feitas por outras funções no arquivo XML
+	 * @param doc
+	 */
+	private void escreveConteudoXML(Document doc) {
+		
+		try {
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(this.database);
+			transformer.transform(source, result);
+		
+		}
+		
+		catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		}
+
+	}
+	
+	/**
+	 * Sobrescreve as anotações de uma imagem ou adiciona registro de uma outra imagem
+	 * @param imagem
+	 * @throws IOException
+	 */
+	private void modificaRegistro(Imagem imagem) throws IOException {
+		try{
+			
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(database.getAbsolutePath());
+			
+	
+			//Checa se o registro já existe
+			NodeList listaImagens = doc.getElementsByTagName("imagem");
+			int tamanhoLista = listaImagens.getLength();
+			
+			for(int i = 0; i < tamanhoLista; i++) {
+				
+				Element e = (Element) listaImagens.item(i);				
+				NamedNodeMap nnm = e.getAttributes();
+				
+				//Caso tenham encontrado anotações sobre a mesma imagem, sobrescreve as informações no banco
+				if( nnm.item(0).getNodeValue().compareTo(imagem.getCaminho() ) == 0 ) {
+					
+					NodeList filhos = e.getChildNodes();
+					
 					filhos.item(0).setTextContent(imagem.getNome());
 					filhos.item(1).setTextContent(imagem.getTags());
 					filhos.item(2).setTextContent(imagem.getLocal());
 					filhos.item(3).setTextContent(imagem.getComida());
 					
-					break;
+					escreveConteudoXML(doc);
+					
+					return;
 				}
 				
 			}
 			
-			//Adiciona imagem
-			/*
-			Element root = doc.getElementById("database");
-			
+			//Insere elemento no XML
+			Element root = doc.getDocumentElement();
+
 			Element image = doc.createElement("imagem");
 			root.appendChild(image);
 			
@@ -97,6 +165,7 @@ public class Sincronizador {
 			
 			//Elemento tags
 			Element tags = doc.createElement("Tags");
+			System.out.println("Tags :> " + imagem.getTags());
 			tags.appendChild(doc.createTextNode(imagem.getTags()));
 			image.appendChild(tags);
 			
@@ -109,22 +178,12 @@ public class Sincronizador {
 			Element comida = doc.createElement("Comida");
 			comida.appendChild(doc.createTextNode(imagem.getComida()));
 			image.appendChild(comida);
-			*/
 			
-			
-			
-			// write the content into xml file
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(this.database);
-			transformer.transform(source, result);
+			escreveConteudoXML(doc);
 			
 			
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
-		   } catch (TransformerException tfe) {
-			tfe.printStackTrace();
 		   } catch (IOException ioe) {
 			ioe.printStackTrace();
 		   } catch (SAXException sae) {
@@ -134,8 +193,11 @@ public class Sincronizador {
 		
 		
 	}
-	
-	//Cria registro XML para armazenar a imagem recebida
+	/**
+	 * Cria registro XML para armazenar anotações do usuário e já insere as informações da imagem recebida
+	 * @param imagem
+	 * @throws IOException
+	 */
 	private void criaRegistro(Imagem imagem) throws IOException {
 
 		try {
@@ -175,34 +237,11 @@ public class Sincronizador {
 			comida.appendChild(doc.createTextNode(imagem.getComida()));
 			image.appendChild(comida);
 	 
-	
-	 
-			// write the content into xml file
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(database);
-	 
-			// Output to console for testing
-			// StreamResult result = new StreamResult(System.out);
-	 
-			transformer.transform(source, result);
-	 
-			System.out.println("File saved!");
+			escreveConteudoXML(doc);
 	 
 		  } catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
-		  } catch (TransformerException tfe) {
-			tfe.printStackTrace();
 		  }
-	}
-
-	public void adicionaTag(Imagem imagem, String newTag) {
 	}
 		
 }
-	//Export to XML
-	
-	//Add tags
-	
-	//Import info

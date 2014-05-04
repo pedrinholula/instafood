@@ -159,6 +159,7 @@ public class MainInterface {
 				String imagemSelecionada = iv.choseImage("", "");
 				try {
 					newImage = new Imagem(imagemSelecionada);
+					sincronizador.importaAnotacoes(newImage);
 					sincronizador.guardaRegistro(newImage);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -192,7 +193,7 @@ public class MainInterface {
 					String newTag = textField.getText();
 					try {
 						newImage.addTag(newTag);
-						sincronizador.adicionaTag(newImage, newTag);
+						sincronizador.guardaRegistro(newImage);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

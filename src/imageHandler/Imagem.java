@@ -113,15 +113,15 @@ public class Imagem {
 	}
 
 	public PlanarImage getImagem() {
-		return imagem;
+		return this.imagem;
 	}
 
 	public String getCaminho() {
-		return caminho;
+		return this.caminho;
 	}
 
 	public String getNome() {
-		return nome;
+		return this.nome;
 	}
 	
 	/**
@@ -137,17 +137,21 @@ public class Imagem {
 		
 		//this.guardaRegistro();
 	}
+	
+	public void setTag(String newTags) {
+		this.tags = newTags;
+	}
 
 	public String getTags() {
-		return tags;
+		return this.tags;
 	}
 
 	public String getLocal() {
-		return local;
+		return this.local;
 	}
 
 	public String getComida() {
-		return comida;
+		return this.comida;
 	}
 	
 	public void setLocal(String local) {
