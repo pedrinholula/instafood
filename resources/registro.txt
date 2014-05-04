@@ -1,0 +1,5 @@
+Nome = logo.jpg
+Caminho = C:\Users\Felipe\Dropbox\workspace_eclipse\Instafood\resources\logo.jpg
+Tags = teste
+Local = 
+Comida = 
