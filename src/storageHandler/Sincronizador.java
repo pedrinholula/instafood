@@ -1,6 +1,5 @@
 package storageHandler;
 
-/*Document builder*/
 import imageHandler.Imagem;
 
 import java.io.File;
@@ -23,6 +22,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Attr;
 
+/**
+ * Cria um arquivo para salvar anotações de imagens e realiza a sincronização do programa com o mesmo
+ * @author Felipe e Pedro
+ *
+ */
+
 public class Sincronizador {
 	File database;
 
@@ -32,7 +37,48 @@ public class Sincronizador {
 	}
 	
 	/**
-	 * Procura se existe anotações do usuário para uma imagem específica. Caso exista, importa as anotações para a imagem
+	 * Carrega todas as metatags para um array de imagens
+	 * @return Imagem
+	 */
+	public Imagem[] readXML(){
+		try{
+			Imagem[] image;
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(database.getAbsolutePath());
+			//Checa se o registro já existe
+			NodeList listaImagens = doc.getElementsByTagName("imagem");
+			int tamanhoLista = listaImagens.getLength();
+			if(tamanhoLista > 0){
+				image = new Imagem[tamanhoLista];
+				for(int i = 0; i<tamanhoLista; i++) {
+					Element e = (Element) listaImagens.item(i);						
+					NamedNodeMap nnm = e.getAttributes();
+					NodeList filhos = e.getChildNodes();
+					String path = nnm.item(0).getNodeValue();
+					image[i] = new Imagem(path);
+					image[i].setTag(filhos.item(1).getTextContent());
+					image[i].setLocal( filhos.item(2).getTextContent());
+					image[i].setComida( filhos.item(3).getTextContent());
+				}
+				return image;
+			}
+			else
+				return null;
+			
+			
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		   } catch (IOException ioe) {
+			ioe.printStackTrace();
+		   } catch (SAXException sae) {
+			sae.printStackTrace();
+		   }
+		return null;
+	}
+	
+	/**
+	 * Procura se existe anotaï¿½ï¿½es do usuï¿½rio para uma imagem especï¿½fica. Caso exista, importa as anotaï¿½ï¿½es para a imagem
 	 * @param imagem
 	 */
 	public void importaAnotacoes(Imagem imagem) {
@@ -76,12 +122,12 @@ public class Sincronizador {
 	}
 	
 	/**
-	 * Guardar o registro das anotações do usuário para uma imagem no xml
+	 * Guardar o registro das anotaï¿½ï¿½es do usuï¿½rio para uma imagem no xml
 	 * @param imagem
 	 * @throws IOException
 	 */
 	public void guardaRegistro(Imagem imagem) throws IOException {		
-		//Verifica se já existe um registro de anotações do usuário
+		//Verifica se jï¿½ existe um registro de anotaï¿½ï¿½es do usuï¿½rio
 		if(database.exists())
 			modificaRegistro(imagem);
 		else
@@ -89,7 +135,7 @@ public class Sincronizador {
 	}
 	
 	/**
-	 * Escreve as modificações feitas por outras funções no arquivo XML
+	 * Escreve as modificaï¿½ï¿½es feitas por outras funï¿½ï¿½es no arquivo XML
 	 * @param doc
 	 */
 	private void escreveConteudoXML(Document doc) {
@@ -110,7 +156,7 @@ public class Sincronizador {
 	}
 	
 	/**
-	 * Sobrescreve as anotações de uma imagem ou adiciona registro de uma outra imagem
+	 * Sobrescreve as anotaï¿½ï¿½es de uma imagem ou adiciona registro de uma outra imagem
 	 * @param imagem
 	 * @throws IOException
 	 */
@@ -122,7 +168,7 @@ public class Sincronizador {
 			Document doc = docBuilder.parse(database.getAbsolutePath());
 			
 	
-			//Checa se o registro já existe
+			//Checa se o registro jï¿½ existe
 			NodeList listaImagens = doc.getElementsByTagName("imagem");
 			int tamanhoLista = listaImagens.getLength();
 			
@@ -131,11 +177,10 @@ public class Sincronizador {
 				Element e = (Element) listaImagens.item(i);				
 				NamedNodeMap nnm = e.getAttributes();
 				
-				//Caso tenham encontrado anotações sobre a mesma imagem, sobrescreve as informações no banco
+				//Caso tenham encontrado anotaï¿½ï¿½es sobre a mesma imagem, sobrescreve as informaï¿½ï¿½es no banco
 				if( nnm.item(0).getNodeValue().compareTo(imagem.getCaminho() ) == 0 ) {
 					
 					NodeList filhos = e.getChildNodes();
-					
 					filhos.item(0).setTextContent(imagem.getNome());
 					filhos.item(1).setTextContent(imagem.getTags());
 					filhos.item(2).setTextContent(imagem.getLocal());
@@ -194,7 +239,7 @@ public class Sincronizador {
 		
 	}
 	/**
-	 * Cria registro XML para armazenar anotações do usuário e já insere as informações da imagem recebida
+	 * Cria registro XML para armazenar anotaï¿½ï¿½es do usuï¿½rio e jï¿½ insere as informaï¿½ï¿½es da imagem recebida
 	 * @param imagem
 	 * @throws IOException
 	 */

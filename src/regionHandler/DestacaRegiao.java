@@ -4,6 +4,11 @@ import regionHandler.LabeledImage;
 import regionHandler.PPMImage;
 import regionHandler.Tools;
 
+/**
+ * Lê uma imagem e seu respectivo mapa de regiões. Cria uma cópia da imagem original com uma região específica destacada
+ * @author Felipe
+ *
+ */
 public final class DestacaRegiao {
 
 	public static void main(String[] args) {
@@ -23,15 +28,10 @@ public final class DestacaRegiao {
 			destPath = args[5];
 		} else {
 			
-			System.out.println("Uso: \n\t java -jar destaca_regiao.jar <imagem_origem> <mapa_de_rotulos> <x> <y> <nivel> <imagem_destino>\n");
+			//System.out.println("Uso: \n\t java -jar destaca_regiao.jar <imagem_origem> <mapa_de_rotulos> <x> <y> <nivel> <imagem_destino>\n");
 			System.exit(0);
 		}
-		/* Para facilitar os testes do programa (Obs: Durante os testes realizados, utilizar acentos dificulta o envio dos argumentos adequados para o programa)
-		int x = 300, y = 600, level = 50;
-		cImagePath = "C:\\Users\\Felipe\\Dropbox\\UFMG\\6 - Programação Modular\\tp1\\TP1.PM2014.1\\resources\\9.10.ppm";
-		labelImagePath = "C:\\Users\\Felipe\\Dropbox\\UFMG\\6 - Programação Modular\\tp1\\TP1.PM2014.1\\resources\\9.10.labels.pgm";
-		destPath = "C:\\Users\\Felipe\\Desktop\\imagem.ppm";
-		*/
+
 		
 		// Lê uma imagem colorida
 		PPMImage colorImage = Tools.readPPM(cImagePath);

@@ -8,7 +8,7 @@ import javax.media.jai.PlanarImage;
 
 /**
  * Classe responsável por armazenar uma imagem e seus respectivos metadados principais
- * @author Felipe
+ * @author Felipe e Pedro
  *
  */
 public class Imagem {
@@ -21,75 +21,6 @@ public class Imagem {
 	String comida;
 
 	/**
-	 * Salva em um .txt os principais metadados da imagem
-	 * @throws IOException
-	 * @throws CloneNotSupportedException 
-	 */
-	/*
-	public void guardaRegistro()  throws IOException {
-		try {
-			 
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-	 
-			// root elements
-			Document doc = docBuilder.newDocument();
-			Element imagem = doc.createElement("imagem");
-			doc.appendChild(imagem);
-			
-	 
-			//Elemento caminho
-			Element caminho = doc.createElement("Caminho");
-			caminho.appendChild(doc.createTextNode(this.caminho));
-			imagem.appendChild(caminho);
-			
-			//Elemento nome
-			Element nome = doc.createElement("Nome");
-			nome.appendChild(doc.createTextNode(this.nome));
-			imagem.appendChild(nome);
-			
-			//Elemento tags
-			Element tags = doc.createElement("Tags");
-			tags.appendChild(doc.createTextNode(this.tags));
-			imagem.appendChild(tags);
-			
-			//Elemento local
-			Element local = doc.createElement("Local");
-			local.appendChild(doc.createTextNode(this.local));
-			imagem.appendChild(local);
-			
-			//Elemento comida
-			Element comida = doc.createElement("Comida");
-			comida.appendChild(doc.createTextNode(this.comida));
-			imagem.appendChild(comida);
-	 
-	
-	 
-			// write the content into xml file
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File(".//resources//anotacoes.xml"));
-	 
-			// Output to console for testing
-			// StreamResult result = new StreamResult(System.out);
-	 
-			transformer.transform(source, result);
-	 
-			System.out.println("File saved!");
-	 
-		  } catch (ParserConfigurationException pce) {
-			pce.printStackTrace();
-		  } catch (TransformerException tfe) {
-			tfe.printStackTrace();
-		  }
-		}
-		*/
-	
-	
-	
-	
-	/*
 	 * Construtor da classe
 	 */
 	public Imagem(String caminho) throws IOException {
@@ -100,11 +31,9 @@ public class Imagem {
 		this.tags = "";
 		this.local = "";
 		this.comida = "";	
-		
-		//this.guardaRegistro();
 	}
 	
-	/*
+	/**
 	 * Retorna em texto as propriedades da imagem
 	 */
 	public String printPropriedades() {
@@ -112,14 +41,26 @@ public class Imagem {
 	this.tags + "\nLocal: " + this.local + "\nComida: " + this.comida;
 	}
 
+	/**
+	 * Retorna imagem utilizada pela classe
+	 * @return
+	 */
 	public PlanarImage getImagem() {
 		return this.imagem;
 	}
 
+	/**
+	 * Retorna o atributo Caminho da imagem
+	 * @return
+	 */
 	public String getCaminho() {
 		return this.caminho;
 	}
 
+	/**
+	 * Retorna nome da imagem
+	 * @return
+	 */
 	public String getNome() {
 		return this.nome;
 	}
@@ -134,30 +75,52 @@ public class Imagem {
 			this.tags = newTag;
 		else
 			this.tags = this.tags + ", " + newTag;
-		
-		//this.guardaRegistro();
 	}
 	
+	/**
+	 * Edita as tags associadas a imagem
+	 * @param newTags
+	 */
 	public void setTag(String newTags) {
 		this.tags = newTags;
 	}
 
+	/**
+	 * Retorna todas as tags da imagem
+	 * @return
+	 */
 	public String getTags() {
 		return this.tags;
 	}
 
+	/**
+	 * Retorna local da imagem
+	 * @return
+	 */
 	public String getLocal() {
 		return this.local;
 	}
 
+	/**
+	 * Retorna atributo Comida da imagem
+	 * @return
+	 */
 	public String getComida() {
 		return this.comida;
 	}
 	
+	/**
+	 * Edita atributo Local da imagem
+	 * @param local
+	 */
 	public void setLocal(String local) {
 		this.local = local;
 	}
 	
+	/**
+	 * Edita atributo Comida da imagem
+	 * @param comida
+	 */
 	public void setComida(String comida) {
 		this.comida = comida;
 	}

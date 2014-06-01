@@ -1,17 +1,11 @@
 package imageHandler;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.io.File;
 
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-
-import regionHandler.DestacaRegiao;
-//import regionHandler.ProcessaRegiao;
 
 import com.sun.media.jai.widget.DisplayJAI;
 
@@ -23,53 +17,45 @@ import com.sun.media.jai.widget.DisplayJAI;
  * 
  */
 @SuppressWarnings("serial")
-public class ImageViewer extends DisplayJAI implements MouseListener,
-		MouseMotionListener {
+public class ImageViewer extends DisplayJAI {
 
 	// Armazenam as coordenadas atuais do mouse
-	private String caminhoImagem, caminhoLabels;
+	protected String caminhoImagem, caminhoLabels;
 
+	/**
+	 * Construtor default
+	 */
 	public ImageViewer() {
 		super();
+		this.caminhoImagem = "null";
 
-		addMouseListener(this);
-		addMouseMotionListener(this);
-		
-		/*//Carrega imagem default
-		String defaultImage = ".//resources//8.01.ppm";
-		PlanarImage image = JAI.create("fileload", defaultImage);
-		//ProcessaRegiao processaRegiao = new ProcessaRegiao(defaultImage); //Essa linha será utilizada para processar imagens de formatos diferentes
-		this.caminhoImagem = defaultImage;
-		this.caminhoLabels = this.caminhoImagem;
-		this.caminhoLabels = this.caminhoLabels.replace(".ppm", "");
-		this.caminhoLabels = this.caminhoLabels.concat(".labels.pgm");
-
-		this.set(image);
-		*/
 	}
 
-	/*
-	 * Destaca a região da imagem que foi selecionada por um clique no mouse(non-Javadoc)
-	 */
-	public void mouseClicked(MouseEvent e) {
-
-		String imgTemp = this.caminhoImagem.replace(".ppm", ".temp.ppm");
-		String[] args = {this.caminhoImagem, this.caminhoLabels, "" +e.getX(), ""+e.getY(), "30", imgTemp};
-		DestacaRegiao.main(args);
-		PlanarImage newImage = JAI.create("fileload", imgTemp);
-		this.set(newImage);
-	}
-	/*
-	 * Abre um painel para seleção do arquivo de entrada e atualiza a imagem visualizada pela escolhida
-	 */
 	
+	/**
+	 * Abre um painel para seleção do arquivo de entrada e atualiza a imagem visualizada pela escolhida
+	 */	
 	public void setImagem(String caminho) {
 		PlanarImage image = JAI.create("fileload", caminho);
+		this.caminhoImagem = caminho;
 		this.set(image);
 		
 	}
 	
-	public String choseImage(String text, String ends) {
+	/**
+	 * Retorna o atributo caminho da imagem
+	 * @return caminho
+	 */
+	public String getCaminhoImagem() {
+		return this.caminhoImagem;
+	}
+	
+	/**
+	 * Permite que o usuário possa escolher uma imagem para ser visualizada de acordo com um determinado tipo de extensão
+	 * @param text
+	 * @param ends
+	 */
+	public void choseImage(String text, String ends) {
 
 		JFileChooser chooser = new JFileChooser();
 		chooser.setDialogTitle(text);
@@ -88,10 +74,8 @@ public class ImageViewer extends DisplayJAI implements MouseListener,
 			this.caminhoLabels = this.caminhoLabels.replace(".ppm", "");
 			this.caminhoLabels = this.caminhoLabels.concat(".labels.pgm");
 			
-			return chooser.getSelectedFile().getAbsolutePath();
+			//return chooser.getSelectedFile().getAbsolutePath();
 		}
-
-		return null;
 	}
 
 }

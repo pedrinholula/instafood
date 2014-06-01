@@ -19,60 +19,91 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 
+import storageHandler.Sincronizador;
 import java.io.IOException;
 
+import imageHandler.Imagem;
+
+/**Realiza a busca de imagens por palavra chave
+ * 
+ * @author Felipe e Pedro
+ *
+ */
+
 public class BuscaTags{
-	public static void main(String[] args) throws IOException, ParseException {
-	    // 0. Specify the analyzer for tokenizing text.
-	    //    The same analyzer should be used for indexing and searching
-	    StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_48);
-
-	    // 1. create the index
-	    Directory index = new RAMDirectory();
-
-	    IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_48, analyzer);
-
+	private static StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_48);
+    private static Directory index = new RAMDirectory();
+    private static IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_48, analyzer);
+	
+	/**
+	* Cria a biblioteca das imagens
+	*/
+	public static final void addImageDoc() throws IOException{
+	Sincronizador sinc = new Sincronizador();
+		Imagem[] image;
+		image = sinc.readXML();
 	    IndexWriter w = new IndexWriter(index, config);
-	    addDoc(w, "Lucene in Action", "193398817");
-	    addDoc(w, "Lucene for Dummies", "55320055Z");
-	    addDoc(w, "Managing Gigabytes", "55063554A");
-	    addDoc(w, "The Art of Computer Science", "9900333X");
+	    for (int i = 0; i < image.length; i++) {
+			addDoc(w, image[i]);
+		}
 	    w.close();
-
-	    // 2. query
-	    String querystr = args.length > 0 ? args[0] : "science";
-
-	    // the "title" arg specifies the default field to use
-	    // when no field is explicitly specified in the query.
-	    Query q = new QueryParser(Version.LUCENE_40, "title", analyzer).parse(querystr);
-
-	    // 3. search
+		return;
+	}
+		
+	/**
+	* Faz a busca nos documentos retornando 
+	* todas as imagens que contenham o termo buscado
+	* @param metatag
+	* @param query
+	* @return Array Imagem
+	*/
+	public static final Imagem[] buscaDoc(String metatag, String querystr) throws ParseException, IOException {	
+		// Define o parser para a nova query
+	    Imagem[] image;
+	    
+	    Query q = new QueryParser(Version.LUCENE_48, "tag", analyzer).parse(querystr);
 	    int hitsPerPage = 10;
 	    IndexReader reader = DirectoryReader.open(index);
 	    IndexSearcher searcher = new IndexSearcher(reader);
 	    TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 	    searcher.search(q, collector);
 	    ScoreDoc[] hits = collector.topDocs().scoreDocs;
-	    
-	    // 4. display results
-	    System.out.println("Found " + hits.length + " hits.");
-	    for(int i=0;i<hits.length;++i) {
-	      int docId = hits[i].doc;
-	      Document d = searcher.doc(docId);
-	      System.out.println((i + 1) + ". " + d.get("isbn") + "\t" + d.get("title"));
-	    }
-
-	    // reader can only be closed when there
-	    // is no need to access the documents any more.
-	    reader.close();
-	  }
-
-	  private static void addDoc(IndexWriter w, String title, String isbn) throws IOException {
-	    Document doc = new Document();
-	    doc.add(new TextField("title", title, Field.Store.YES));
-
-	    // use a string field for isbn because we don't want it tokenized
-	    doc.add(new StringField("isbn", isbn, Field.Store.YES));
-	    w.addDocument(doc);
-	  }
+		
+		if(hits.length > 0){
+			image = new Imagem[hits.length];
+			for (int i = 0; i < hits.length; i++) {
+				int docId = hits[i].doc;
+    			Document d = searcher.doc(docId);
+				image[i] = new Imagem(d.get("caminho"));
+				image[i].setLocal (d.get("local"));
+				image[i].setTag  (d.get("tag"));
+				image[i].setComida(d.get("comida"));
+			}
+			return image;
+		}
+		else{
+			return null;
+		}
+		
+	}
+	
+	
+	/**
+	 * Add images metatag's to a index
+	 * @param w
+	 * @param image
+	 * @throws IOException
+	 * @return void
+	 */
+	private static void addDoc(IndexWriter w, Imagem image) throws IOException {
+		// Place a new document
+		Document doc = new Document();
+		// Add infos to a doc
+		doc.add(new StringField("caminho", image.getCaminho(), Field.Store.YES));
+		doc.add(new StringField("nome"   , image.getNome()	 , Field.Store.YES));
+		doc.add(new StringField("local"  , image.getLocal()  , Field.Store.YES));
+		doc.add(new TextField(	"tag"	 , image.getTags()   , Field.Store.YES));
+		doc.add(new TextField(	"comida" , image.getComida() , Field.Store.YES));
+		w.addDocument(doc);
+	}
 }
