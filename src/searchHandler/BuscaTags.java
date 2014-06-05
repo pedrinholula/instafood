@@ -61,7 +61,7 @@ public class BuscaTags{
 		// Define o parser para a nova query
 	    Imagem[] image;
 	    
-	    Query q = new QueryParser(Version.LUCENE_48, "tag", analyzer).parse(querystr);
+	    Query q = new QueryParser(Version.LUCENE_48, metatag, analyzer).parse(querystr);
 	    int hitsPerPage = 10;
 	    IndexReader reader = DirectoryReader.open(index);
 	    IndexSearcher searcher = new IndexSearcher(reader);
